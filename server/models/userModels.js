@@ -35,7 +35,11 @@ const userSchema = new mongoose.Schema({
     description:{
         type:String,
         default:""
-    }
+    },
+    posts:[{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:'Post'
+    }]
 },{
     timestamps:true
 })

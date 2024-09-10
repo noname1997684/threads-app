@@ -8,28 +8,14 @@ import { useRecoilState, useRecoilValue } from 'recoil'
 import userAtom from '../atoms/userAtom'
 import { DeleteIcon } from '@chakra-ui/icons'
 import postsAtom from '../atoms/postsAtom'
-const Post = ({post}) => {
+import useGetCreator from '../hooks/useGetCreator'
+const Post = ({post,isReply}) => {
     const user= useRecoilValue(userAtom)
     const showToast=useShowToast()
-    const [creator,setCreator]= useState(null)
+    const creator = useGetCreator(post.postedBy)
     const navigate= useNavigate()
     const [posts,setPosts]= useRecoilState(postsAtom)
-    useEffect(()=>{
-        const getCreator= async()=>{
-            try {
-                const res=await fetch(`/api/user/profile/${post.postedBy}`)
-                const data= await res.json()
-                if(data.error){
-                    showToast("Error",data.error,"error")
-                    return
-                }
-                setCreator(data)
-            } catch (error) {
-                showToast("Error",error,"error")
-            }
-        }
-        getCreator()
-    },[post.postedBy,showToast])
+    
     const handleDeletePost= async(e)=>{
         e.preventDefault()
         try {
@@ -88,7 +74,7 @@ const Post = ({post}) => {
                         </Box>
                     )}
                     <Flex gap={3} my={1}>
-                        <Icons post={post}/>
+                        <Icons post={post} isReply={isReply}/>
                     </Flex>
             </Flex>
         </Flex>

@@ -54,7 +54,7 @@ const UserPage = () => {
         {!loadingUserPosts && posts.length===0 && <Text>User has no posts</Text>}
         {!loadingUserPosts &&
         posts.map((post)=>(
-            <Post key={post?._id} post={post}/>
+            <Post key={post?._id} post={post} isReply={false}/>
         ))}
     </>
   )

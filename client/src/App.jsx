@@ -25,7 +25,7 @@ const App = () => {
             
             <Container maxW={pathname==="/chat"?"920px":"640px"}> 
             <HeaderPage/>
-            <Flex justifyContent={"center"} flexDirection={"column"} w={"full"}  px={3} py={1} roundedTop={"3xl"} bg={user?useColorModeValue("white","gray.dark"):useColorModeValue("white","black")} mt={user?0:20}>
+            <Flex justifyContent={"flex-start"} minH={"95%"} flexDirection={"column"} w={"full"}  px={3} py={1} roundedTop={"3xl"} bg={user?useColorModeValue("white","gray.dark"):useColorModeValue("white","black")} mt={user?0:20}>
                 <Routes>
                 <Route path='/' element={ <HomePage/>}/>
                 <Route path='/auth' element={!user ? <AuthPage/>:<Navigate to="/"/>}/>

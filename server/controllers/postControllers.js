@@ -15,13 +15,14 @@ export const createPost = async (req, res) => {
         const uploadedResponse = await cloudinary.uploader.upload(picURL)
         picURL = uploadedResponse.url
     }
-
+    
     const newPost= await Post.create({
         postedBy,
         content,
         img:picURL
     })
     await newPost.save()
+    await User.findByIdAndUpdate(postedBy,{$push:{posts:newPost._id}})
     res.status(201).json(newPost)
    } catch (err) {
     res.status(500).json({error:err.message})
@@ -34,7 +35,7 @@ export const getUserPosts = async(req,res)=>{
         if(!user){
             return res.status(404).json({error:"User not found"})
         }
-        const posts = await Post.find({postedBy:user._id})
+        const posts = await Post.find({postedBy:user._id,parentId:null}).sort({createdAt:-1})
         res.status(200).json(posts)
     } catch (err) {
         res.status(500).json({error:err.message})
@@ -68,24 +69,24 @@ export const commentPost = async(req,res)=>{
     try {
         const {text}=req.body
         const {id:postId}= req.params
-        const userId= req.user._id
-        const userProfile= req.user.profilePicture
-        const userUsername= req.user.username
+        const postedBy= req.user._id
+       
         if(!text){
             return res.status(400).json({error:"Please add text to comment"})
         }
-        const post= await Post.findById(postId)
-        if(!post){
+        const parentPost= await Post.findById(postId)
+        if(!parentPost){
             return res.status(404).json({error:"Post not found"})
         }
-        const comment={
-            text,
-            userId,
-            profilePicture:userProfile,
-            username:userUsername
-        }
-        post.replies.push(comment)
-        await post.save()
+        const comment=new Post({
+            postedBy,
+            content:text,
+            parentId:postId
+        })
+        await comment.save()
+        await Post.findByIdAndUpdate(postId,{$push:{replies:comment._id}})
+
+        
         res.status(200).json(comment)
     } catch (err) {
         res.status(500).json({error:err.message})
@@ -94,6 +95,10 @@ export const commentPost = async(req,res)=>{
 export const getPost = async(req,res)=>{
     try {
         const post= await Post.findById(req.params.id)
+        .populate({path:"replies", 
+        populate:{path:"replies",
+        model:Post
+       }})
         if(!post){
             return res.status(404).json({error:"Post not found"})
         }
@@ -104,7 +109,10 @@ export const getPost = async(req,res)=>{
 }
 export const getFeedPosts = async(req,res)=>{
     try {
-        const posts= await Post.find().sort({createdAt:-1})
+        const posts= await Post.find({parentId:null}).sort({createdAt:-1})
+        .populate({path:"replies"
+        }).exec()
+        
         res.status(200).json(posts)
     } catch (err) {
         res.status(500).json({error:err.message})

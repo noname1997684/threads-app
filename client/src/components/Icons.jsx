@@ -1,5 +1,5 @@
 import { Box, Button, Flex, FormControl, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Text, useDisclosure } from '@chakra-ui/react'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { FaHeart } from "react-icons/fa6";
 import { FaRegHeart } from "react-icons/fa";
 import { FaRegComment } from "react-icons/fa";
@@ -10,10 +10,15 @@ import useShowToast from '../hooks/useShowToast';
 import postAtom from '../atoms/postAtom';
 
 import SigninModal from './SigninModal';
-const Icons = ({post}) => {
+import { useNavigate, useParams } from 'react-router-dom';
+import useGetCreator from '../hooks/useGetCreator';
+const Icons = ({post,isReply}) => {
   const user= useRecoilValue(userAtom)
-  const [liked,setLiked]= useState(post?.likes.includes(user?._id))
   const [currentPost,setCurrentPost]= useRecoilState(postAtom)
+  console.log(currentPost)
+  const [liked,setLiked]= useState(post?.likes.includes(user?._id))
+  console.log(liked,post?.likes.includes(user?._id))
+  
   const [posts,setPosts]= useRecoilState(postsAtom)
   const [text,setText]= useState('')
   const {onClose:onCloseComment,onOpen:onOpenComment,isOpen:isOpenComment}= useDisclosure()
@@ -21,6 +26,9 @@ const Icons = ({post}) => {
   const showToast = useShowToast()
   const [loading,setLoading]= useState(false)
   const [modalTitle,setModalTitle]= useState("")
+  const navigate= useNavigate()
+  const creator= useGetCreator(post.postedBy)
+  
   const handleLike= async()=>{
 
     if(!user) return showToast("Error","You need to sign in to like the post","error")
@@ -110,7 +118,9 @@ const Icons = ({post}) => {
   return (
     <Flex flexDirection={"column"}>
         <Flex gap={1} onClick={(e)=>e.preventDefault()} align={"center"}>
-          <Button rounded={"full"} px={4} py={2} onClick={user?handleLike:()=>{showModal("Sign in to like post")}}>
+          <Button rounded={"full"} px={4} py={2} onClick={user?(isReply?()=>{
+            navigate(`/${creator?.username}/post/${post?._id}`)
+            }:handleLike):()=>{showModal("Sign in to like post")}}>
           <Flex align={"center"} gap={1}>
             {liked?<FaHeart size={20} fill='red' color='red' />:<FaRegHeart  size={20}/>}
             <Text>{post?.likes.length}</Text>

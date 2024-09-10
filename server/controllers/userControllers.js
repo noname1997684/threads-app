@@ -66,7 +66,8 @@ export const LoginUser = async (req,res)=>{
         description:user.description,
         profilePicture:user.profilePicture,
         followers:user.followers,
-        following:user.following
+        following:user.following,
+        posts:user.posts
     })
     }
     catch(err){

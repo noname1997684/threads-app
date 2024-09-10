@@ -5,11 +5,13 @@ import { Avatar, Box, Button, Divider, Flex, Image, Spinner, Text } from '@chakr
 import { formatDistanceToNow } from 'date-fns'
 import Icons from '../components/Icons'
 import useGetUserProfile  from '../hooks/useGetUserProfile'
-import { useRecoilState } from 'recoil'
+import { useRecoilState,  } from 'recoil'
 import postAtom  from '../atoms/postAtom'
 import Comments from '../components/Comments'
+import Post from '../components/Post'
 const PostPage = () => {
     const {user,loading}=useGetUserProfile()
+   
     const {postId}=useParams()
     const showToast=useShowToast()
     const [post,setPost]= useRecoilState(postAtom)
@@ -31,7 +33,8 @@ const PostPage = () => {
         }
       }
         getPost()  
-    },[postId,showToast])
+       console.log(post)
+    },[postId,showToast,setPost])
     if(loading){
         return (
             <Flex justify={"ceter"}>
@@ -64,16 +67,16 @@ const PostPage = () => {
         </Box>
     )}
     <Flex gap={3} my={3}>
-        <Icons post={post}/>
+        <Icons post={post} />
     </Flex>
     <Divider my={4}/>
-    {post.replies.map((reply)=>(
-        <Comments 
-        key={reply?._id}
-        reply={reply}
-        lastReply={reply._id === post.replies[post.replies.length-1]._id}
-        />
-       
+    {post.replies && post.replies.map((reply)=>(
+        // <Comments 
+        // key={reply?._id}
+        // reply={reply}
+        // lastReply={reply._id === post.replies[post.replies.length-1]._id}
+        // />
+       <Post post={reply} isReply={true} key={reply._id}/>
     ))}
     </>
   )
