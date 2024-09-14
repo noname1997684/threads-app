@@ -1,5 +1,5 @@
 import express from 'express';
-import {deletePost,getFeedPosts,getPost, createPost,getUserPosts,likePost,commentPost } from '../controllers/postControllers.js';
+import {getSearchPosts,getUserRepliedPosts,deletePost,getFeedPosts,getPost, createPost,getUserPosts,likePost,commentPost } from '../controllers/postControllers.js';
 import checkAuthorization from '../middleware/checkAuthorization.js';
 const router = express.Router();
 
@@ -10,4 +10,6 @@ router.patch('/like/:id',checkAuthorization,likePost)
 router.patch('/comment/:id',checkAuthorization,commentPost)
 router.get('/feed',getFeedPosts)
 router.delete('/delete/:id',checkAuthorization,deletePost)
+router.get('/replies/:username',getUserRepliedPosts)
+router.get('/search',getSearchPosts)
 export default router

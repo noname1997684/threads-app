@@ -25,8 +25,10 @@ const colors={
         dark:'#1e1e1e'
     }
 }
-
-const theme= extendTheme({styles,config,colors})
+const breakpoints={
+    tablet:"670px"
+}
+const theme= extendTheme({styles,config,colors,breakpoints})
 ReactDOM.createRoot(document.getElementById('root')).render(
     <React.StrictMode>
         <BrowserRouter>

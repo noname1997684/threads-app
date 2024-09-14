@@ -92,7 +92,7 @@ const MessageContainer = () => {
     },[socket,messages,selectedConversation,currentUser._id])
     
     return (
-    <Flex flex={70} bg={useColorModeValue("gray.200","gray.dark")}
+    <Flex flex={70} bg={useColorModeValue("white","gray.dark")}
     borderRadius={"md"} flexDirection={"column"} p={2}
     >   
         <Flex w={"full"} h={12} alignItems={"center"} gap={2}>

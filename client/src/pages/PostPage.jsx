@@ -6,18 +6,25 @@ import { formatDistanceToNow } from 'date-fns'
 import Icons from '../components/Icons'
 import useGetUserProfile  from '../hooks/useGetUserProfile'
 import { useRecoilState,  } from 'recoil'
-import postAtom  from '../atoms/postAtom'
-import Comments from '../components/Comments'
+// import postAtom  from '../atoms/postAtom'
+// import Comments from '../components/Comments'
 import Post from '../components/Post'
+import postsAtom from '../atoms/postsAtom'
+import { DeleteIcon } from '@chakra-ui/icons'
+import useDeletePost from '../hooks/useDeletePost'
+import MenuPost from '../components/MenuPost'
 const PostPage = () => {
     const {user,loading}=useGetUserProfile()
-   
+    const [posts,setPosts]= useRecoilState(postsAtom)
     const {postId}=useParams()
     const showToast=useShowToast()
-    const [post,setPost]= useRecoilState(postAtom)
-   
+    // const [post,setPost]= useRecoilState(postAtom)
+    const handleDeletePost= useDeletePost()
+   const post=posts[0]
     useEffect(()=>{
+        
       const getPost= async()=>{
+        setPosts([])
         try{
             const res= await fetch(`/api/post/getpost/${postId}`)
             const data= await res.json()
@@ -25,7 +32,7 @@ const PostPage = () => {
                 showToast("Error",data.error,"error")
                 return
             }
-            setPost(data)
+            setPosts([data])
            
         }
         catch(error){
@@ -33,8 +40,9 @@ const PostPage = () => {
         }
       }
         getPost()  
-       console.log(post)
-    },[postId,showToast,setPost])
+       
+    },[postId,showToast,setPosts])
+    
     if(loading){
         return (
             <Flex justify={"ceter"}>
@@ -51,24 +59,24 @@ const PostPage = () => {
             <Flex>
                 <Text fontSize={"sm"} fontWeight={"bold"}>{user?.username}</Text>
             </Flex>
-
-        </Flex>
-        <Flex gap={4} align={"center"}>
             <Text fontSize={"sm"} width={"max-content"} color={"gray.light"}>
                 {formatDistanceToNow(new Date(post.createdAt))} ago
             </Text>
         </Flex>
+       <MenuPost post={post}/>
     </Flex>
     <Text my={3}>{post.content}</Text>
     {post.img && (
-        <Box overflow={"hidden"} border={"1px solid"}  borderRadius={6} borderColor={"gray.light"} >
-            <Image src={post.img} w={"full"} height={"full"} />
+        <Box overflow={"hidden"} border={"1px solid"} w={"fit-content"}  borderRadius={6} borderColor={"gray.light"} >
+            <Image src={post.img}  height={"500"} />
 
         </Box>
     )}
     <Flex gap={3} my={3}>
         <Icons post={post} />
     </Flex>
+    <Divider my={4}/>
+    <Text fontWeight={"bold"}> Replies</Text>
     <Divider my={4}/>
     {post.replies && post.replies.map((reply)=>(
         // <Comments 

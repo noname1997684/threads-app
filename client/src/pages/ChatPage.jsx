@@ -131,7 +131,7 @@ const ChatPage = () => {
     
     p={4}
     >
-        <Flex gap={4} flexDirection={"row"} maxW={{sm:"400px",md:"full"}} mx={"auto"}>
+        <Flex gap={4} flexDirection={"row"} maxW={{base:"100%",md:"full"}} mx={"auto"}>
             <Flex flex={30} gap={2} flexDirection={"column"}
                 maxW={{sm:"250",md:"full"}}
                 mx={"auto"}

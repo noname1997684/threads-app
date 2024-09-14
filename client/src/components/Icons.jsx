@@ -7,24 +7,24 @@ import {useRecoilState, useRecoilValue} from 'recoil'
 import userAtom from '../atoms/userAtom'
 import postsAtom from '../atoms/postsAtom'
 import useShowToast from '../hooks/useShowToast';
-import postAtom from '../atoms/postAtom';
+
 
 import SigninModal from './SigninModal';
 import { useNavigate, useParams } from 'react-router-dom';
+
 import useGetCreator from '../hooks/useGetCreator';
 const Icons = ({post,isReply}) => {
   const user= useRecoilValue(userAtom)
-  const [currentPost,setCurrentPost]= useRecoilState(postAtom)
-  console.log(currentPost)
+  // const [currentPost,setCurrentPost]= useRecoilState(postAtom)
   const [liked,setLiked]= useState(post?.likes.includes(user?._id))
-  console.log(liked,post?.likes.includes(user?._id))
   
   const [posts,setPosts]= useRecoilState(postsAtom)
   const [text,setText]= useState('')
   const {onClose:onCloseComment,onOpen:onOpenComment,isOpen:isOpenComment}= useDisclosure()
   const {onOpen:onOpenModal,isOpen:isOpenModal, onClose:onCloseModal}= useDisclosure()
   const showToast = useShowToast()
-  const [loading,setLoading]= useState(false)
+  const [replyLoading,setReplyLoading]= useState(false)
+  const [likeLoading,setLikeLoading]= useState(false)
   const [modalTitle,setModalTitle]= useState("")
   const navigate= useNavigate()
   const creator= useGetCreator(post.postedBy)
@@ -32,7 +32,8 @@ const Icons = ({post,isReply}) => {
   const handleLike= async()=>{
 
     if(!user) return showToast("Error","You need to sign in to like the post","error")
-
+      if(likeLoading) return
+      setLikeLoading(true)
 
     try {
       const res= await fetch(`/api/post/like/${post._id}`,{
@@ -46,24 +47,26 @@ const Icons = ({post,isReply}) => {
         showToast("Error",data.error,"error")
         return
       }
-      if(liked){
+      if(!liked){
        
-        const newPost= {...post,likes:post.likes.filter((id)=>id!==user._id)}
-        setCurrentPost(newPost)
+        // const newPost= {...post,likes:post.likes.filter((id)=>id!==user._id)}
+        // setCurrentPost(newPost)
         const newPosts= posts.map((p)=>{
           if(p._id===post._id){
-            return newPost
+            // return newPost
+            return {...p,likes:[...p.likes,user._id]}
           }
           return p
         })
         setPosts(newPosts)
       }else{
         
-        const newPost= {...post,likes:[...post.likes,user._id]}
-        setCurrentPost(newPost)
+        // const newPost= {...post,likes:[...post.likes,user._id]}
+        // setCurrentPost(newPost)
         const newPosts= posts.map((p)=>{
           if(p._id===post._id){
-            return newPost
+            // return newPost
+            return {...p,likes:p.likes.filter((id)=>id!== user._id)}
           }
           return p
         })
@@ -73,14 +76,16 @@ const Icons = ({post,isReply}) => {
       setLiked(!liked)
     } catch (error) {
       showToast("Error",error,"error")
+    } finally{
+      setLikeLoading(false)
     }
   }
 
   const handleComment= async()=>{
     if(!user) return showToast("Error","You need to sign in to comment on the post","error")
     if(!text) return showToast("Error","Please enter a comment","error")
-    if(loading) return
-    setLoading(true)
+    if(replyLoading) return
+    setReplyLoading(true)
     try {
       const res= await fetch(`/api/post/comment/${post._id}`,{
         method:'PATCH',
@@ -94,11 +99,11 @@ const Icons = ({post,isReply}) => {
         showToast("Error",data.error,"error")
         return
       }
-      const newPost= {...post,replies:[...post.replies,data]}
-      setCurrentPost(newPost)
+      // const newPost= {...post,replies:[...post.replies,data]}
+      // setCurrentPost(newPost)
       const newPosts= posts.map((p)=>{
         if(p._id===post._id){
-          return newPost
+          return {...p,replies:[...p.replies,data]}
         }
         return p
       })
@@ -106,9 +111,10 @@ const Icons = ({post,isReply}) => {
     } catch (error) {
       showToast("Error",error,"error")
     } finally{
+      setReplyLoading(false)
       setText('')
-      onClose()
-      setLoading(false)
+      onCloseComment()
+      
     }
   }
   const showModal=(text)=>{
@@ -126,7 +132,9 @@ const Icons = ({post,isReply}) => {
             <Text>{post?.likes.length}</Text>
           </Flex>
           </Button >
-          <Button rounded={"full"} px={4} py={2} onClick={user?onOpenComment:()=>{showModal("Sign in to comment post")}}>
+          <Button rounded={"full"} px={4} py={2} onClick={user?(isReply?()=>{
+            navigate(`/${creator?.username}/post/${post?._id}`)
+            }:onOpenComment):()=>{showModal("Sign in to comment post")}}>
           <Flex align={"center"} gap={2}>
           <FaRegComment size={20} style={{transform:'rotateY(180deg)'}}/>
           <Text>{post?.replies.length}</Text>
@@ -148,7 +156,7 @@ const Icons = ({post,isReply}) => {
               </FormControl>
             </ModalBody>
             <ModalFooter>
-              <Button colorScheme='blue' size={"sm"} mr={3} onClick={handleComment} isLoading={loading}>Reply</Button>
+              <Button colorScheme='blue' size={"sm"} mr={3} onClick={handleComment} isLoading={replyLoading}>Reply</Button>
             </ModalFooter>
           </ModalContent>
         </Modal>

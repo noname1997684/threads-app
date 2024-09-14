@@ -14,6 +14,9 @@ import ChatPage from './pages/ChatPage'
 import Header from './components/Header'
 import HeaderPage from './components/HeaderPage'
 import { AddIcon } from '@chakra-ui/icons'
+import Bottombar from './components/Bottombar'
+import SearchPage from './pages/SearchPage'
+
 const App = () => {
   const user= useRecoilValue(userAtom)
   const {onOpen,isOpen,onClose}= useDisclosure()
@@ -23,16 +26,18 @@ const App = () => {
     <Flex position={"relative"} w={"full"} h={"100vh"} flexDir={user?"row":"column"}>
         {user ? <Sidebar/>:<Header/>}
             
-            <Container maxW={pathname==="/chat"?"920px":"640px"}> 
-            <HeaderPage/>
-            <Flex justifyContent={"flex-start"} minH={"95%"} flexDirection={"column"} w={"full"}  px={3} py={1} roundedTop={"3xl"} bg={user?useColorModeValue("white","gray.dark"):useColorModeValue("white","black")} mt={user?0:20}>
+            <Container maxW={pathname==="/chat"?{lg:"800px",md:"560px",xl:"920px",base:"100%",}:{md:"640px",base:"100%"}}> 
+            {user && <HeaderPage/>}
+            <Flex justifyContent={"flex-start"} minH={"95%"} flexDirection={"column"} w={"full"}  px={3} py={3} roundedTop={"3xl"} bg={user?{base:useColorModeValue("gray.100","black"),md:useColorModeValue("white","gray.dark")}:useColorModeValue("white","black")} mt={user?{base:20,md:0}:20}>
                 <Routes>
                 <Route path='/' element={ <HomePage/>}/>
                 <Route path='/auth' element={!user ? <AuthPage/>:<Navigate to="/"/>}/>
                 <Route path='/user/:username' element={<UserPage/>}/>
+                <Route path="/user/:username/replies" element={<UserPage/>}/>
                 <Route path='/update' element={<UpdateProfilePage/>}/>  
                  <Route path='/:username/post/:postId' element={<PostPage/>}/>           
                 <Route path='/chat' element={user? <ChatPage/>:<Navigate to={"/auth"}/>}/>
+                <Route path="/search" element={<SearchPage/>}/>
             </Routes>
               </Flex>
             
@@ -44,12 +49,14 @@ const App = () => {
               bg={useColorMode().colorMode === 'light' ? 'gray.300' : 'gray.dark'}
               onClick={onOpen}
               size={"lg"}
+              display={{base:"none",md:"block"}}
               >
                   <AddIcon boxSize={6}/>
               </Button>
             )}
             <CreatePost isOpen={isOpen} onClose={onClose}/>
             </Container>
+            <Bottombar/>           
     </Flex> 
   )
 }

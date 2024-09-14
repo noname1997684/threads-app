@@ -4,13 +4,14 @@ import { useRecoilValue } from 'recoil'
 import userAtom from '../atoms/userAtom'
 import {BsInstagram} from 'react-icons/bs'
 import {CgMoreO} from 'react-icons/cg'
-import { Link as RouterLink } from 'react-router-dom'
+import { Link as RouterLink, useLocation } from 'react-router-dom'
 import useFollowing from '../hooks/useFollowing'
 const UserHeader = ({user}) => {
     const userLogin = useRecoilValue(userAtom)
     
     const {following,handleFollow,loading}= useFollowing(user)
-    
+    const pathname= useLocation().pathname
+   
   return (
     <VStack gap={4} alignItems={"start"}>
         <Flex justifyContent={"space-between"} w={"full"}>
@@ -86,11 +87,15 @@ const UserHeader = ({user}) => {
             </Flex>
         </Flex>
         <Flex w={"full"}>
-            <Flex flex={1} borderBottom={`1.5px solid  ${useColorModeValue("black","white")}`} justifyContent={"center"} pb={3}>
+            <Flex flex={1} borderBottom={pathname==`/user/${user.username}`?`1.5px solid  ${useColorModeValue("black","white")}`:`1px solid ${useColorModeValue("white","gray.dark")}`} color={pathname==`/user/${user.username}`?useColorModeValue("black","white"):"gray.light"} justifyContent={"center"} pb={3}>
+                <Link as={RouterLink} to={`/user/${user.username}`} _hover={{ textDecoration: "none" }}>
                 <Text fontWeight={"bold"}>Threads</Text>
+                </Link>
             </Flex>
-            <Flex flex={1} borderBottom={`1px solid ${useColorModeValue("white","gray.dark")}`} color={"gray.light"} justifyContent={"center"} pb={3}>
+            <Flex flex={1} borderBottom={pathname==`/user/${user.username}/replies`?`1.5px solid  ${useColorModeValue("black","white")}`:`1px solid ${useColorModeValue("white","gray.dark")}`} color={pathname==`/user/${user.username}/replies`?useColorModeValue("black","white"):"gray.light"} justifyContent={"center"} pb={3}>
+                <Link as={RouterLink} to={`/user/${user.username}/replies`} _hover={{ textDecoration: "none" }}>
                 <Text fontWeight={"bold"}>Replies</Text>
+                </Link>
             </Flex>
         </Flex>
     </VStack>

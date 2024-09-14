@@ -1,6 +1,7 @@
 import Post from '../models/postModels.js'
 import {v2 as cloudinary} from 'cloudinary'
 import User from '../models/userModels.js'
+import fetchRepliesThread from '../utils/fetchRepliesThread.js'
 export const createPost = async (req, res) => {
    
     try {
@@ -125,12 +126,59 @@ export const deletePost = async(req,res)=>{
         if(!post){
             return res.status(404).json({error:"Post not found"})
         }
+        const childReplies= await fetchRepliesThread(postId)
+        const childRepliesIds= [
+            postId,
+            ...childReplies.map(reply=>reply._id)
+        ]
+        
+        const uniqueCreatorIds= new Set([
+            ...childRepliesIds.map(reply=>reply?.postedBy?.toString()),
+            post?.postedBy?.toString(),
+        ].filter((id)=>id!==undefined))
+        for(const replies of childReplies){
+            if(replies.img){
+                await cloudinary.uploader.destroy(replies.img.split('/').pop().split('.')[0])
+            }
+        }
         if(post.img){
             await cloudinary.uploader.destroy(post.img.split('/').pop().split('.')[0])
         }
-        await Post.findByIdAndDelete(postId)
+        await Post.deleteMany({_id:{$in:childRepliesIds}})
+        await User.updateMany({_id:{$in:[...uniqueCreatorIds]}},{$pull:{posts:{$in:childRepliesIds}}})
         res.status(200).json({message:"Post deleted successfully"})
-    } catch (error) {
+    } catch (err) {
         res.status(500).json({error:err.message})
     }
+}
+
+export const getUserRepliedPosts = async(req,res)=>{
+    try{
+        const {username}= req.params
+        const user= await User.findOne({username})
+        const RepliePosts= await Post.find({parentId:null}).populate({path:"replies",match:{postedBy:{$eq:user._id}}}).exec()
+        const filteredReplies= RepliePosts.filter(post=>post.replies.length>0)
+        res.status(200).json(filteredReplies)
+    }catch(err){
+        res.status(500).json({error:err.message})
+    }
+}
+
+export const getSearchPosts = async(req,res)=>{
+    try {
+        const {search}= req.query
+        console.log(search)
+        const posts=await Post.find({
+            parentId:null,
+            content:{
+                $regex:search,
+                $options:"i"
+            }
+        }).populate({path:"replies"}).exec()
+
+    res.status(200).json(posts)
+    } catch (err) {
+        res.status(500).json({error:err.message})
+    }
+    
 }

@@ -166,14 +166,24 @@ export const followUser= async(req,res)=>{
 
 export const getSuggestedUsers= async(req,res)=>{
     try {
+        const {search}= req.query
+        
         const userId= req.user._id
         const userFollowed = await User.findById(userId).select('following')
+        let suggestedUsers
+        if(!search){
         const users= await User.aggregate([
             {$match:{_id:{$ne:userId}}},
             {$sample:{size:10}},
             {$project:{password:0}} 
         ])
-        const suggestedUsers= users.filter(user=>!userFollowed.following.includes(user._id))
+        suggestedUsers= users.filter(user=>!userFollowed.following.includes(user._id))
+    } else{
+        
+       
+        suggestedUsers= await User.find({_id:{$ne:userId},username:{$regex:search,$options:"i"}})
+        
+    }
         res.status(200).json(suggestedUsers)
     } catch (err) {
         res.status(400).json({error:err.message})
