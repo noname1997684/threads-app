@@ -1,4 +1,4 @@
-import { Avatar, Button, Center, Flex, FormControl, FormLabel, Heading, Input, Stack, useColorModeValue } from '@chakra-ui/react'
+import { Avatar, Button, Center, Flex, FormControl, FormLabel, Heading, Input, Stack, Textarea, useColorModeValue } from '@chakra-ui/react'
 import React, { useRef, useState } from 'react'
 import { useRecoilState } from 'recoil'
 import userAtom from '../atoms/userAtom'
@@ -6,6 +6,7 @@ import useGetPicture from '../hooks/useGetPicture'
 import useShowToast from '../hooks/useShowToast'
 import {useNavigate} from 'react-router-dom'
 const UpdateProfilePage = () => {
+    const MAX_LENGTH=30
     const {handlePicChange,picURL}= useGetPicture()
     const [user,setUser]= useRecoilState(userAtom)
     const [loading, setLoading]= useState(false)
@@ -19,6 +20,13 @@ const UpdateProfilePage = () => {
     const pictureFileRef= useRef(null)
     const showToast= useShowToast()
     const navigate= useNavigate()
+    const handleInputChange=(e)=>{
+        if(e.target.value.length>MAX_LENGTH){
+            setInput({...input,[e.target.name]:e.target.value.slice(0,MAX_LENGTH)})
+        }else{
+            setInput({...input,[e.target.name]:e.target.value})
+        }
+    }
     const handleSubmit=async(e)=>{
         e.preventDefault()
         setLoading(true)
@@ -72,7 +80,8 @@ const UpdateProfilePage = () => {
                     <Input placeholder='Your Name' type='text'
                     _placeholder={{color:'gray.500'}}
                     value={input.name}
-                    onChange={(e)=>setInput({...input,name:e.target.value})}
+                    name='name'
+                    onChange={handleInputChange}
                     />
                 </FormControl>
                 <FormControl>
@@ -80,7 +89,8 @@ const UpdateProfilePage = () => {
                     <Input placeholder='Your Username' type='text'
                     _placeholder={{color:'gray.500'}}
                     value={input.username}
-                    onChange={(e)=>setInput({...input,username:e.target.value})}
+                    name='username'
+                    onChange={handleInputChange}
                     />
                 </FormControl>
                 <FormControl>
@@ -88,12 +98,13 @@ const UpdateProfilePage = () => {
                     <Input placeholder='Your Email' type='email'
                     _placeholder={{color:'gray.500'}}
                     value={input.email}
-                    onChange={(e)=>setInput({...input,email:e.target.value})}
+                    name='email'
+                    onChange={handleInputChange}
                     />
                 </FormControl>
                 <FormControl>
                     <FormLabel>Description</FormLabel>
-                    <Input placeholder='Your Desciption' type='text'
+                    <Textarea placeholder='Your Desciption' type='text'
                     _placeholder={{color:'gray.500'}}
                     value={input.description}
                     onChange={(e)=>setInput({...input,description:e.target.value})}

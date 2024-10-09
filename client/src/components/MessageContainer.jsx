@@ -55,9 +55,9 @@ const MessageContainer = () => {
             setLoading(true)
             setMessages([])
             try {
-              
+                console.log(selectedConversation)
                 if(selectedConversation.mock) return
-                const res = await fetch(`/api/message/${selectedConversation.userId}`)
+                const res = await fetch(`/api/message/${selectedConversation?.userId}`)
                 const data= await res.json()
                 if(data.error){
                     showToast("Error",data.error,"error")

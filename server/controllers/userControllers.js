@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 import mongoose from "mongoose";
 import {v2 as cloundinary} from "cloudinary";
 import generateCookiesAndToken from "../utils/generateCookiesAndToken.js";
+const MAX_LENGTH=5
 export const RegisterUser = async (req, res) => {
     try {
         const {password,username,name,email}= req.body
@@ -166,25 +167,28 @@ export const followUser= async(req,res)=>{
 
 export const getSuggestedUsers= async(req,res)=>{
     try {
-        const {search}= req.query
+        
+        const {search,page}= req.query
         
         const userId= req.user._id
+        
         const userFollowed = await User.findById(userId).select('following')
         let suggestedUsers
+        let totalUsers
         if(!search){
-        const users= await User.aggregate([
-            {$match:{_id:{$ne:userId}}},
-            {$sample:{size:10}},
-            {$project:{password:0}} 
-        ])
+        const users= await User.find({_id:{$ne:userId}})
+        
         suggestedUsers= users.filter(user=>!userFollowed.following.includes(user._id))
+        totalUsers= suggestedUsers.length
+        suggestedUsers= suggestedUsers.slice((page-1)*MAX_LENGTH,page*MAX_LENGTH)
     } else{
         
-       
-        suggestedUsers= await User.find({_id:{$ne:userId},username:{$regex:search,$options:"i"}})
+       totalUsers= await User.find({_id:{$ne:userId},username:{$regex:search,$options:"i"}}).countDocuments()
+        suggestedUsers= await User.find({_id:{$ne:userId},username:{$regex:search,$options:"i"}}).skip((page-1)*MAX_LENGTH).limit(MAX_LENGTH)
         
     }
-        res.status(200).json(suggestedUsers)
+        const isNext= MAX_LENGTH*(page-1)+ suggestedUsers.length<totalUsers
+        res.status(200).json({suggestedUsers,isNext})
     } catch (err) {
         res.status(400).json({error:err.message})
     }

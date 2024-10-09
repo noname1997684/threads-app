@@ -2,6 +2,8 @@ import Post from '../models/postModels.js'
 import {v2 as cloudinary} from 'cloudinary'
 import User from '../models/userModels.js'
 import fetchRepliesThread from '../utils/fetchRepliesThread.js'
+
+const MAX_POST_RENDERS=5
 export const createPost = async (req, res) => {
    
     try {
@@ -31,13 +33,19 @@ export const createPost = async (req, res) => {
 }
 export const getUserPosts = async(req,res)=>{
     try {
+        const {page}= req.query
         const {username} = req.params
         const user = await User.findOne({username})
+       
         if(!user){
             return res.status(404).json({error:"User not found"})
         }
-        const posts = await Post.find({postedBy:user._id,parentId:null}).sort({createdAt:-1})
-        res.status(200).json(posts)
+        const totalPost= await Post.find({postedBy:user._id,parentId:null}).countDocuments()
+
+        const posts = await Post.find({postedBy:user._id,parentId:null}).sort({createdAt:-1}).skip(MAX_POST_RENDERS*(page-1)).limit(MAX_POST_RENDERS)
+
+        const isNext= MAX_POST_RENDERS*(page-1)+ posts.length<totalPost
+        res.status(200).json({posts,isNext})
     } catch (err) {
         res.status(500).json({error:err.message})
     }
@@ -110,11 +118,15 @@ export const getPost = async(req,res)=>{
 }
 export const getFeedPosts = async(req,res)=>{
     try {
+        const {page}= req.query
+        const TotalPost= await Post.find({parentId:null}).countDocuments()
+
         const posts= await Post.find({parentId:null}).sort({createdAt:-1})
+        .skip(MAX_POST_RENDERS*(page-1)).limit(MAX_POST_RENDERS)
         .populate({path:"replies"
         }).exec()
-        
-        res.status(200).json(posts)
+        const isNext= MAX_POST_RENDERS*(page-1)+ posts.length<TotalPost
+        res.status(200).json({posts,isNext})
     } catch (err) {
         res.status(500).json({error:err.message})
     }
@@ -154,11 +166,16 @@ export const deletePost = async(req,res)=>{
 
 export const getUserRepliedPosts = async(req,res)=>{
     try{
+        const {page}= req.query
+
         const {username}= req.params
         const user= await User.findOne({username})
         const RepliePosts= await Post.find({parentId:null}).populate({path:"replies",match:{postedBy:{$eq:user._id}}}).exec()
         const filteredReplies= RepliePosts.filter(post=>post.replies.length>0)
-        res.status(200).json(filteredReplies)
+        const totalReplies= filteredReplies.length
+        const skippedReplies= filteredReplies.slice(MAX_POST_RENDERS*(page-1),MAX_POST_RENDERS*page)
+        const isNext= MAX_POST_RENDERS*(page-1)+ skippedReplies.length<totalReplies
+        res.status(200).json({posts:skippedReplies,isNext})
     }catch(err){
         res.status(500).json({error:err.message})
     }
@@ -166,17 +183,24 @@ export const getUserRepliedPosts = async(req,res)=>{
 
 export const getSearchPosts = async(req,res)=>{
     try {
-        const {search}= req.query
-        console.log(search)
+        
+        const {page,search}= req.query
+        const totalPost= await Post.find({
+            parentId:null,
+            content:{
+                $regex:search,
+                $options:"i"
+            }
+        }).countDocuments()
         const posts=await Post.find({
             parentId:null,
             content:{
                 $regex:search,
                 $options:"i"
             }
-        }).populate({path:"replies"}).exec()
-
-    res.status(200).json(posts)
+        }).skip(MAX_POST_RENDERS*(page-1)).limit(MAX_POST_RENDERS).populate({path:"replies"}).exec()
+        const isNext= MAX_POST_RENDERS*(page-1)+ posts.length<totalPost
+    res.status(200).json({posts,isNext})
     } catch (err) {
         res.status(500).json({error:err.message})
     }

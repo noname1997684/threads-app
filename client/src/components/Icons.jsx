@@ -1,5 +1,5 @@
-import { Box, Button, Flex, FormControl, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Text, useDisclosure } from '@chakra-ui/react'
-import React, { useEffect, useState } from 'react'
+import {  Button, Flex, FormControl, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Text, useDisclosure } from '@chakra-ui/react'
+import React, {useState } from 'react'
 import { FaHeart } from "react-icons/fa6";
 import { FaRegHeart } from "react-icons/fa";
 import { FaRegComment } from "react-icons/fa";
@@ -10,12 +10,12 @@ import useShowToast from '../hooks/useShowToast';
 
 
 import SigninModal from './SigninModal';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 import useGetCreator from '../hooks/useGetCreator';
 const Icons = ({post,isReply}) => {
   const user= useRecoilValue(userAtom)
-  // const [currentPost,setCurrentPost]= useRecoilState(postAtom)
+  
   const [liked,setLiked]= useState(post?.likes.includes(user?._id))
   
   const [posts,setPosts]= useRecoilState(postsAtom)
@@ -49,11 +49,10 @@ const Icons = ({post,isReply}) => {
       }
       if(!liked){
        
-        // const newPost= {...post,likes:post.likes.filter((id)=>id!==user._id)}
-        // setCurrentPost(newPost)
+        
         const newPosts= posts.map((p)=>{
           if(p._id===post._id){
-            // return newPost
+            
             return {...p,likes:[...p.likes,user._id]}
           }
           return p
@@ -61,11 +60,10 @@ const Icons = ({post,isReply}) => {
         setPosts(newPosts)
       }else{
         
-        // const newPost= {...post,likes:[...post.likes,user._id]}
-        // setCurrentPost(newPost)
+       
         const newPosts= posts.map((p)=>{
           if(p._id===post._id){
-            // return newPost
+            
             return {...p,likes:p.likes.filter((id)=>id!== user._id)}
           }
           return p
@@ -99,8 +97,7 @@ const Icons = ({post,isReply}) => {
         showToast("Error",data.error,"error")
         return
       }
-      // const newPost= {...post,replies:[...post.replies,data]}
-      // setCurrentPost(newPost)
+      
       const newPosts= posts.map((p)=>{
         if(p._id===post._id){
           return {...p,replies:[...p.replies,data]}
@@ -141,7 +138,10 @@ const Icons = ({post,isReply}) => {
         </Flex>
         </Button>
         </Flex>
-        <Modal isOpen={isOpenComment} onClose={onCloseComment}>
+        <Modal isOpen={isOpenComment} onClose={()=>{
+          onCloseComment()
+          setText('')
+          }}>
           <ModalOverlay/>
           <ModalContent>
             <ModalHeader></ModalHeader>
@@ -150,7 +150,14 @@ const Icons = ({post,isReply}) => {
               <FormControl>
                 <Input placeholder='Replies'
                 value={text}
-                onChange={(e)=>setText(e.target.value)}
+                onChange={(e)=>{
+                  if(e.target.value.length>200){
+                    setText(e.target.value.slice(0,200))
+                  }
+                  else{
+                    setText(e.target.value)
+                  }
+                }}
                 />
 
               </FormControl>

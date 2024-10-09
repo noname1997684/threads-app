@@ -1,13 +1,11 @@
-import { Box, Button, Flex, Image, Link ,Text, useColorMode, useColorModeValue, useDisclosure } from '@chakra-ui/react'
+import { Button, Flex, Image, Link ,Text, useColorMode, useColorModeValue, useDisclosure } from '@chakra-ui/react'
 import {Link as RouterLink} from 'react-router-dom'
 import React, { useState } from 'react'
 import { BiHomeAlt2 } from 'react-icons/bi'
 import { FaRegUser } from 'react-icons/fa6'
-import { AddIcon } from '@chakra-ui/icons'
 import { IoCreateOutline } from "react-icons/io5"
 import { BiSolidHomeAlt2 } from "react-icons/bi";
 import { useLocation } from 'react-router-dom'
-import { IoIosArrowForward } from "react-icons/io";
 import SigninModal from './SigninModal'
 const Header = () => {
   const [modalTitle,setModalTitle]= useState("")

@@ -21,12 +21,12 @@ const App = () => {
   const user= useRecoilValue(userAtom)
   const {onOpen,isOpen,onClose}= useDisclosure()
   const {pathname}=useLocation()
-  
+  console.log(pathname)
   return (
     <Flex position={"relative"} w={"full"} h={"100vh"} flexDir={user?"row":"column"}>
-        {user ? <Sidebar/>:<Header/>}
+        {pathname!=="/auth" && (user ? <Sidebar/>:<Header/>)}
             
-            <Container maxW={pathname==="/chat"?{lg:"800px",md:"560px",xl:"920px",base:"100%",}:{md:"640px",base:"100%"}}> 
+            <Container maxW={pathname==="/chat"?{lg:"800px",md:"560px",xl:"920px",base:"100%",}:{md:"640px",base:"100%"}} > 
             {user && <HeaderPage/>}
             <Flex justifyContent={"flex-start"} minH={"95%"} flexDirection={"column"} w={"full"}  px={3} py={3} roundedTop={"3xl"} bg={user?{base:useColorModeValue("gray.100","black"),md:useColorModeValue("white","gray.dark")}:useColorModeValue("white","black")} mt={user?{base:20,md:0}:20}>
                 <Routes>

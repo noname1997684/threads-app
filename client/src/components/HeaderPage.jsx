@@ -1,10 +1,10 @@
 import { Box, Button, Flex, Image, Text, useColorMode, useColorModeValue } from '@chakra-ui/react'
 import React from 'react'
-import { RouterProvider, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
+import {useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import MenuComp from './MenuComp'
 import { IoMdArrowRoundBack } from "react-icons/io";
 const HeaderPage = () => {
-    const {pathname}= useLocation()
+    
     const {colorMode}= useColorMode()
     const navigate= useNavigate()
    const [query]= useSearchParams()

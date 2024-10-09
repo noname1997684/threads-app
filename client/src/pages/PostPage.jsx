@@ -1,25 +1,24 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect} from 'react'
 import { useParams } from 'react-router-dom'
 import useShowToast from '../hooks/useShowToast'
-import { Avatar, Box, Button, Divider, Flex, Image, Spinner, Text } from '@chakra-ui/react'
+import { Avatar, Box,  Divider, Flex, Image, Spinner, Text } from '@chakra-ui/react'
 import { formatDistanceToNow } from 'date-fns'
 import Icons from '../components/Icons'
 import useGetUserProfile  from '../hooks/useGetUserProfile'
 import { useRecoilState,  } from 'recoil'
-// import postAtom  from '../atoms/postAtom'
-// import Comments from '../components/Comments'
+
 import Post from '../components/Post'
 import postsAtom from '../atoms/postsAtom'
-import { DeleteIcon } from '@chakra-ui/icons'
-import useDeletePost from '../hooks/useDeletePost'
+
+
 import MenuPost from '../components/MenuPost'
 const PostPage = () => {
     const {user,loading}=useGetUserProfile()
     const [posts,setPosts]= useRecoilState(postsAtom)
     const {postId}=useParams()
     const showToast=useShowToast()
-    // const [post,setPost]= useRecoilState(postAtom)
-    const handleDeletePost= useDeletePost()
+   
+    
    const post=posts[0]
     useEffect(()=>{
         
@@ -79,11 +78,7 @@ const PostPage = () => {
     <Text fontWeight={"bold"}> Replies</Text>
     <Divider my={4}/>
     {post.replies && post.replies.map((reply)=>(
-        // <Comments 
-        // key={reply?._id}
-        // reply={reply}
-        // lastReply={reply._id === post.replies[post.replies.length-1]._id}
-        // />
+        
        <Post post={reply} isReply={true} key={reply._id}/>
     ))}
     </>

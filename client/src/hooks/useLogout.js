@@ -1,12 +1,13 @@
-import React from 'react'
 import { useSetRecoilState } from 'recoil'
 import userAtom from '../atoms/userAtom'
 import useShowToast from './useShowToast'
 import { useNavigate } from 'react-router-dom'
+import {selectedConversationAtom} from '../atoms/messagesAtom'
 const useLogout = () => {
     const setUser = useSetRecoilState(userAtom)
     const showToast = useShowToast()
     const navigate= useNavigate()
+    const setSelectedConversationAtom= useSetRecoilState(selectedConversationAtom)
     const logout= async()=>{
     try {
         const res= await fetch('/api/user/logout',{
@@ -22,6 +23,7 @@ const useLogout = () => {
         }
         localStorage.removeItem('user')
         setUser(null)
+        setSelectedConversationAtom(null)
         navigate('/auth')
     } catch (error) {
         showToast("Error",error, 'error')

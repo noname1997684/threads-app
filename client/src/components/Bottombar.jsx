@@ -1,17 +1,16 @@
-import { Box, Button, Flex, IconButton, Image, Link, Menu, MenuButton, MenuItem, MenuList, useColorMode, useColorModeValue, useDisclosure } from '@chakra-ui/react'
+import { Box, Button, Flex, useColorModeValue, useDisclosure } from '@chakra-ui/react'
 import React from 'react'
-import {useRecoilValue, useSetRecoilState} from 'recoil'
-import {authScreenAtom} from '../atoms/authAtom'
-import {Link as RouterLink, useLocation, useNavigate} from 'react-router-dom'
+import {useRecoilValue} from 'recoil'
+
+import {Link as RouterLink, useLocation} from 'react-router-dom'
 import userAtom from '../atoms/userAtom'
-import {FiLogOut} from 'react-icons/fi'
-import useLogout from '../hooks/useLogout'
+
 import { BiHomeAlt2, BiSolidHomeAlt2 } from "react-icons/bi";
 import { FaRegUser } from "react-icons/fa6";
 import { FaUser } from "react-icons/fa6";
 import { TbMessageCircle2 } from "react-icons/tb";
 import { AddIcon } from '@chakra-ui/icons'
-import CreatePost from './CreatePost'
+
 import { TbMessageCircle2Filled } from "react-icons/tb";
 
 const Bottombar = () => {

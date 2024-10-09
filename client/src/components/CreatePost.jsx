@@ -70,7 +70,7 @@ const CreatePost = ({isOpen,onClose}) => {
             <Text ml={3} fontWeight={"bold"} color={useColorModeValue("black","white")}>{user?.username}</Text>
           </Flex>
           <FormControl mt={2}>
-            <Input type='text' placeholder='Post content' value={inputContent} onChange={handleInputContentChange}/>
+            <Textarea type='text' placeholder='Post content' value={inputContent} onChange={handleInputContentChange}/>
             <Text fontSize={"xs"} fontWeight={"bold"} textAlign={"right"} m={1} color={"gray.light"}>
               {inputContentRemain}/{MAX_CONTENT_LENGTH}
             </Text>
@@ -88,6 +88,7 @@ const CreatePost = ({isOpen,onClose}) => {
             <Image src={picURL} alt='Post Picture' h={"460"} borderRadius={"lg"}/>
             <CloseButton onClick={()=>setPicURL(null)}
             bg={"gray.800"}
+            color={"white"}
             position={"absolute"}
             top={2}
             right={2}  
@@ -98,7 +99,7 @@ const CreatePost = ({isOpen,onClose}) => {
           )}
         </ModalBody>
         <ModalFooter>
-          <Button colorScheme='blue' onClick={handleCreatePost} onLoad={loading}>
+          <Button colorScheme='blue' onClick={handleCreatePost} isLoading={loading}>
             Post
           </Button>
         </ModalFooter>

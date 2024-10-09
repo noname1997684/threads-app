@@ -20,7 +20,7 @@ const ChatPage = () => {
     const {socket,onlineUsers}= useSocket()
     
     useEffect(()=>{
-         console.log("hello")
+         
         socket?.on("messageSeen",({conversationId})=>{
            
             setConversations((prev)=>{
