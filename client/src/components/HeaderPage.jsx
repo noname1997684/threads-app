@@ -4,17 +4,25 @@ import {useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import MenuComp from './MenuComp'
 import { IoMdArrowRoundBack } from "react-icons/io";
 const HeaderPage = () => {
-    
+    const pageName={
+      "":"Home Page",
+      "chat":"Chat Page",
+      "search":"Search Page",
+      "user":"User Page",
+    }
     const {colorMode}= useColorMode()
     const navigate= useNavigate()
    const [query]= useSearchParams()
     const search= query.get('q')
+    let{pathname}= useLocation()
+   pathname= pathname.split("/")[1]
+    console.log(pathname)
   return (
     <Flex w={"100%"} alignItems={"center"} justifyContent={"center"} py={4} position={{base:"fixed",md:"relative"}} top={0} bg={useColorModeValue("gray.100","black")} zIndex={99}>
         {search && <Button onClick={()=>navigate('/search')} position={"absolute"} top={2} left={2} border={"1px solid"} borderColor={useColorModeValue("black","white")} bg={"transparent"} borderRadius={"full"} p={1}>
           <IoMdArrowRoundBack size={18}/>
           </Button>}
-        <Text fontWeight={"bold"} display={{base:"none",md:"block"}}>Header Page</Text>
+        <Text fontWeight={"bold"} display={{base:"none",md:"block"}}>{pageName[pathname]}</Text>
         <Box display={{base:"block",md:"none"}}>
     <Image 
       onClick={()=>navigate('/')}

@@ -1,6 +1,6 @@
-import { Avatar, Box, Divider, Flex,  Image,Text} from '@chakra-ui/react'
+import { Avatar, Box, Divider, Flex,  Image,Text, useDisclosure} from '@chakra-ui/react'
 import {Link ,useLocation,useNavigate} from 'react-router-dom'
-
+import UpdatePost from '../components/UpdatePost'
 
 import {formatDistanceToNow} from 'date-fns'
 import Icons from './Icons'
@@ -10,7 +10,7 @@ import useGetCreator from '../hooks/useGetCreator'
 import MenuPost from './MenuPost'
 const Post = ({post,isReply}) => {
     
-    
+    const {isOpen,onOpen,onClose}= useDisclosure()
     const creator= useGetCreator(post?.postedBy)
     const navigate= useNavigate()
     const pathname= useLocation().pathname
@@ -44,7 +44,7 @@ const Post = ({post,isReply}) => {
                            
                         </Flex> 
                         
-                       <MenuPost post={post}/>
+                       <MenuPost post={post} creator={creator} updateOpen={onOpen}/>
                     </Flex>
                     {post.content && <Text fontSize={"md"}>{post.content}</Text>}
                    
@@ -62,6 +62,7 @@ const Post = ({post,isReply}) => {
             </Flex>
         </Flex>
         {pathname.includes('replies') && isReply && <Divider/>}
+        <UpdatePost isOpen={isOpen} onClose={onClose} post={post}/>
     </Link>
   )
 }

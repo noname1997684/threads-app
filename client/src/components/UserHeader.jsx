@@ -1,17 +1,24 @@
 import { Avatar, Box, Button, Flex, Link, Menu, MenuButton, MenuItem, MenuList, Portal, Text, useColorModeValue, VStack } from '@chakra-ui/react'
 import React from 'react'
 import { useRecoilValue } from 'recoil'
+import { IoIosLink } from "react-icons/io";
 import userAtom from '../atoms/userAtom'
 import {BsInstagram} from 'react-icons/bs'
 import {CgMoreO} from 'react-icons/cg'
 import { Link as RouterLink, useLocation } from 'react-router-dom'
 import useFollowing from '../hooks/useFollowing'
+import useShowToast from '../hooks/useShowToast'
 const UserHeader = ({user}) => {
     const userLogin = useRecoilValue(userAtom)
-    
+    const showToast= useShowToast()
     const {following,handleFollow,loading}= useFollowing(user)
     const pathname= useLocation().pathname
-   
+    const copyURL=()=>{
+        const currentURL= window.location.href
+        navigator.clipboard.writeText(currentURL).then(()=>{
+            showToast("Success","Link Copied","success")
+        })
+    }
   return (
     <VStack gap={4} alignItems={"start"}>
         <Flex justifyContent={"space-between"} w={"full"}>
@@ -79,7 +86,7 @@ const UserHeader = ({user}) => {
                         </MenuButton>
                         <Portal>
                             <MenuList bg={useColorModeValue("white","gray.dark")}>
-                                <MenuItem bg={useColorModeValue("white","gray.dark")}>Copy Link</MenuItem>
+                                <MenuItem bg={"transparent"} _hover={{bg:useColorModeValue("gray.100","black")}} borderRadius={"lg"} p={3} icon={<IoIosLink/>} onClick={copyURL}>Copy Link</MenuItem>
                             </MenuList>
                         </Portal>
                     </Menu>

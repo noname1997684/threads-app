@@ -10,7 +10,7 @@ import SigninModal from './SigninModal'
 const Header = () => {
   const [modalTitle,setModalTitle]= useState("")
   const {colorMode}= useColorMode()
-  console.log(colorMode)
+ 
   const {pathname}= useLocation()
   const {onOpen:onOpenModal,isOpen:isOpenModal, onClose:onCloseModal}= useDisclosure()
   return (

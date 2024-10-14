@@ -206,3 +206,29 @@ export const getSearchPosts = async(req,res)=>{
     }
     
 }
+
+export const updatePost = async(req,res)=>{
+    try {
+        const {content}= req.body
+        let {picURL}= req.body
+        const {id:postId}= req.params
+        let post= await Post.findById(postId)
+        if(!post){
+            return res.status(404).json({error:"Post not found"})
+        }
+        if(picURL){
+            await cloudinary.uploader.destroy(post.img.split('/').pop().split('.')[0])
+
+            const uploadedResponse = await cloudinary.uploader.upload(picURL)
+            picURL = uploadedResponse.secure_url
+        }
+        post.content= content||post.content
+        post.img= picURL||post.img
+        await post.save()
+        res.status(200).json(post)
+       
+    }
+    catch(err){
+        res.status(500).json({error:err.message})
+    }
+}

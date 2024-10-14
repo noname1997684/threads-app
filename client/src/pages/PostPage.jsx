@@ -1,7 +1,7 @@
 import React, { useEffect} from 'react'
 import { useParams } from 'react-router-dom'
 import useShowToast from '../hooks/useShowToast'
-import { Avatar, Box,  Divider, Flex, Image, Spinner, Text } from '@chakra-ui/react'
+import { Avatar, Box,  Divider, Flex, Image, Spinner, Text, useDisclosure } from '@chakra-ui/react'
 import { formatDistanceToNow } from 'date-fns'
 import Icons from '../components/Icons'
 import useGetUserProfile  from '../hooks/useGetUserProfile'
@@ -12,12 +12,13 @@ import postsAtom from '../atoms/postsAtom'
 
 
 import MenuPost from '../components/MenuPost'
+import UpdatePost from '../components/UpdatePost'
 const PostPage = () => {
     const {user,loading}=useGetUserProfile()
     const [posts,setPosts]= useRecoilState(postsAtom)
     const {postId}=useParams()
     const showToast=useShowToast()
-   
+    const {isOpen,onOpen,onClose}= useDisclosure()
     
    const post=posts[0]
     useEffect(()=>{
@@ -62,7 +63,7 @@ const PostPage = () => {
                 {formatDistanceToNow(new Date(post.createdAt))} ago
             </Text>
         </Flex>
-       <MenuPost post={post}/>
+       <MenuPost post={post} creator={user} updateOpen={onOpen}/>
     </Flex>
     <Text my={3}>{post.content}</Text>
     {post.img && (
@@ -81,6 +82,7 @@ const PostPage = () => {
         
        <Post post={reply} isReply={true} key={reply._id}/>
     ))}
+    <UpdatePost isOpen={isOpen} onClose={onClose} post={post}/>
     </>
   )
 }
