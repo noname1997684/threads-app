@@ -21,6 +21,9 @@ const SearchPost = () => {
  useEffect(()=>{
     const fetchSearchPost= async()=>{
     setLoading(true)
+    if(page===1){
+    setPosts([])
+    }
       try {
         const res= await fetch(`/api/post/search?search=${search}&page=${page}`)
         const data= await res.json()

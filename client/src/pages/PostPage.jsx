@@ -79,7 +79,6 @@ const PostPage = () => {
     <Text fontWeight={"bold"}> Replies</Text>
     <Divider my={4}/>
     {post.replies && post.replies.map((reply)=>(
-        
        <Post post={reply} isReply={true} key={reply._id}/>
     ))}
     <UpdatePost isOpen={isOpen} onClose={onClose} post={post}/>

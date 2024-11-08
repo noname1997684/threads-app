@@ -5,9 +5,13 @@ import {FaMoon} from 'react-icons/fa'
 import {BiSun} from 'react-icons/bi'
 import {FiLogOut} from 'react-icons/fi'
 import useLogout from '../hooks/useLogout'
+import { Link } from 'react-router-dom'
+import { useRecoilValue } from 'recoil'
+import userAtom from '../atoms/userAtom'
 const MenuComp = () => {
     const {colorMode,toggleColorMode}= useColorMode()
     const logout= useLogout()
+    const user= useRecoilValue(userAtom)
   return (
           
     <Box>
@@ -20,9 +24,11 @@ const MenuComp = () => {
           </Button>
         </MenuItem>
         <MenuItem onClick={logout} p={4} borderRadius={"xl"} fontWeight={"bold"} bg={"transparent"} _hover={{bg:useColorModeValue("gray.100","black")}}>
-       <Button variant={"ghost"}  rightIcon={<FiLogOut size={24}/>} width={"100%"} gap={20} _hover={{bg:"transparent"}}>
+       {user ?(<Button variant={"ghost"}  rightIcon={<FiLogOut size={24}/>} width={"100%"} gap={20} _hover={{bg:"transparent"}}>
             Logout
-          </Button>
+          </Button>):(<Button as={Link} to={"/auth"} variant={"ghost"}  rightIcon={<FiLogOut size={24}/>} width={"100%"} gap={20} _hover={{bg:"transparent"}}>
+            Login
+          </Button>)}
         </MenuItem>
       </MenuList>
     </Menu>

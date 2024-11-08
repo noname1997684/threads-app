@@ -6,7 +6,7 @@ const SuggestedUser = ({user}) => {
   const {handleFollow,following,loading}=useFollowing(user)
     return (
     <Flex gap={2} justifyContent={"space-between"} alignItems={"center"}>
-        <Flex gap={2} as={Link} to={`user/${user.username}`}>  
+        <Flex gap={2} as={Link} to={`/user/${user.username}`}>  
             <Avatar src={user.profilePicture}/>
             <Box>
                 <Text fontSize={"sm"} fontWeight={"bold"}>

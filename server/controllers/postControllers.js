@@ -2,8 +2,11 @@ import Post from '../models/postModels.js'
 import {v2 as cloudinary} from 'cloudinary'
 import User from '../models/userModels.js'
 import fetchRepliesThread from '../utils/fetchRepliesThread.js'
+import Notification from '../models/notificationModels.js'
+import { getRecipientSocketId,io } from '../utils/socket.js'
 
 const MAX_POST_RENDERS=5
+const MAX_ACTIVITY_RENDERS=8
 export const createPost = async (req, res) => {
    
     try {
@@ -55,8 +58,9 @@ export const likePost = async(req,res)=>{
     try {
         const {id:postId}= req.params
         const userId= req.user._id
-        
+      
         const post= await Post.findById(postId)
+        const userSocketId= getRecipientSocketId(post.postedBy)
         if(!post){
             return res.status(404).json({error:"Post not found"})
         }
@@ -64,10 +68,23 @@ export const likePost = async(req,res)=>{
      
         if(hasLiked){
             await post.updateOne({$pull:{likes:userId}})
+            if(post.postedBy.toString()!==userId.toString()){
+            await Notification.findOneAndDelete({postId,sender:userId,type:"like"})
+            }
             res.status(200).json({message:"Unlike post success"})
+
         }
         else{
             await post.updateOne({$push:{likes:userId}})
+            if(post.postedBy.toString()!==userId.toString()){
+            await Notification.create({
+                postId,
+                sender:userId,
+                type:"like"
+            })
+            await User.updateOne({_id:post.postedBy},{$set:{notifications:true}})
+            io.to(userSocketId).emit('newActivity')
+        }
             res.status(200).json({message:"Liked post success"})
         }
     } catch (err) {
@@ -79,7 +96,7 @@ export const commentPost = async(req,res)=>{
         const {text}=req.body
         const {id:postId}= req.params
         const postedBy= req.user._id
-       
+        
         if(!text){
             return res.status(400).json({error:"Please add text to comment"})
         }
@@ -92,10 +109,19 @@ export const commentPost = async(req,res)=>{
             content:text,
             parentId:postId
         })
+
         await comment.save()
         await Post.findByIdAndUpdate(postId,{$push:{replies:comment._id}})
-
-        
+        const userSocketId= getRecipientSocketId(parentPost.postedBy)
+        if(postedBy.toString()!==parentPost.postedBy.toString()){
+        await Notification.create({
+            postId,
+            sender:postedBy,
+            type:"comment"
+        })
+        await User.updateOne({_id:parentPost.postedBy},{$set:{notifications:true}})
+        io.to(userSocketId).emit('newActivity')
+    }
         res.status(200).json(comment)
     } catch (err) {
         res.status(500).json({error:err.message})
@@ -229,6 +255,20 @@ export const updatePost = async(req,res)=>{
        
     }
     catch(err){
+        res.status(500).json({error:err.message})
+    }
+}
+
+export const getActivity = async(req,res)=>{
+    try {
+        const {page}= req.query
+        const {userId}= req.params
+        const userPosts= await Post.find({postedBy:userId})
+        const totalActivity= await Notification.find({postId:{$in:userPosts.map(post=>post._id)}}).countDocuments()
+        const userPostsActivity= await Notification.find({postId:{$in:userPosts.map(post=>post._id)}}).populate({path:"sender",model:"User",select:"username profilePicture"}).sort({createdAt:-1}).skip(MAX_ACTIVITY_RENDERS*(page-1)).limit(MAX_ACTIVITY_RENDERS)
+        const isNext= MAX_ACTIVITY_RENDERS*(page-1)+ userPostsActivity.length<totalActivity
+        res.status(200).json({activity:userPostsActivity,isNext})
+    } catch (err) {
         res.status(500).json({error:err.message})
     }
 }

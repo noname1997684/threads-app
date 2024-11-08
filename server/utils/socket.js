@@ -3,6 +3,7 @@ import express from 'express';
 import http from 'http';
 import Conversation from '../models/conversationModels.js';
 import Message from '../models/messageModels.js';
+import User from '../models/userModels.js';
 
 const app = express();
 const server = http.createServer(app);
@@ -26,12 +27,22 @@ io.on('connection',(socket)=>{
     }
     io.emit("onlineUsers",Object.keys(userSockets))
     socket.on('userSeenMessage',async({conversationId,senderId})=>{
-        console.log(senderId,conversationId)
+        
         try {
             await Message.updateMany({conversationId:conversationId,seen:false,sender:senderId},{$set:{seen:true}})
             await Conversation.updateOne({_id:conversationId},{$set:{'lastMessage.seen':true}})
             io.to(userSockets[senderId]).emit('messageSeen',{conversationId})
         } catch (error) {
+            console.log(error)
+        }
+    })
+    socket.on('seenNotifications',async(userId)=>{
+        try{
+            console.log('seenNotifications')
+            await User.updateOne({_id:userId},{$set:{notifications:false}})
+            io.to(userSockets[userId]).emit('notificationsSeen')
+        }
+        catch(error){
             console.log(error)
         }
     })

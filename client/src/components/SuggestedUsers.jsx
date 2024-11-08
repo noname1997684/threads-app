@@ -5,10 +5,13 @@ import { IoSearchSharp } from "react-icons/io5";
 import SuggestedUser from "../components/SuggestedUser"
 
 import { useLocation, useNavigate } from 'react-router-dom';
+import { useRecoilValue } from 'recoil';
+import userAtom from '../atoms/userAtom';
 
 const SuggestedUsers = ({}) => {
     const [input,setInput]= useState('')
     const [suggestUsers,setSuggestUsers]= useState([])
+    const user= useRecoilValue(userAtom)
     const [loading,setLoading]= useState(true)
     const [page,setPage]= useState(1)
     const showToast= useShowToast()
@@ -20,21 +23,29 @@ const SuggestedUsers = ({}) => {
         setSuggestUsers([])
         window.scrollTo(0,0)
       },[pathname])
-
+    if(user){
     useEffect(()=>{
       const fetchSuggestedUser= async()=>{
         setLoading(true)
+        if(page===1){
+          setSuggestUsers([])
+          }
+        if(input){
+          setPage(1)
+        }
         try {
+          
           const res= await fetch(`/api/user/suggested?search=${input}&page=${page}`)
           const data= await res.json()
           if(data.error){
               showToast('Error',data.error,'error')
               return
           }
+          
           if(page===1){
           setSuggestUsers(data.suggestedUsers)
           }else{
-                setSuggestUsers(prev=>[...new Set([...prev,...data.suggestedUsers])])
+            setSuggestUsers(prev=>[...new Set([...prev,...data.suggestedUsers])])
           }
           setHasMore(data.isNext)
       } catch (error) {
@@ -45,7 +56,7 @@ const SuggestedUsers = ({}) => {
       }
       fetchSuggestedUser()
     },[showToast,input,page])
-    
+  }
     const handleSearchPost= async(e)=>{
       if(e.key!=="Enter") return
       navigate(`/search?q=${input}`)
@@ -62,6 +73,7 @@ const SuggestedUsers = ({}) => {
       )
         if(node) lastUsers.current.observe(node)
     },[loading,hasMore])
+  console.log(suggestUsers)
   return (
     <Flex p={3} flexDirection={"column"} gap={5}>
       
@@ -77,12 +89,13 @@ const SuggestedUsers = ({}) => {
         Suggested Users
     </Text>
     <Flex direction={"column"} gap={4}>
+      {!user && <Text>Log in to see suggested users</Text>}
         {suggestUsers.map((user,index)=>
         <Box ref={suggestUsers.length===index+1?lastUsersCallback:null} key={user._id}>
         <SuggestedUser user={user} key={user._id}/>
         </Box>
         )} 
-        {loading && [1,2,3,4,5].map((_,index)=>(
+        {loading && user && [1,2,3,4,5].map((_,index)=>(
             <Flex key={index} gap={2} align={"center"} p={1} borderRadius={"md"}>
                 <Box>
                     <SkeletonCircle size={"10"}/>

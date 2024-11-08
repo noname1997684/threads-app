@@ -3,7 +3,7 @@ import bcrypt from "bcryptjs";
 import mongoose from "mongoose";
 import {v2 as cloundinary} from "cloudinary";
 import generateCookiesAndToken from "../utils/generateCookiesAndToken.js";
-const MAX_LENGTH=5
+const MAX_LENGTH=9
 export const RegisterUser = async (req, res) => {
     try {
         const {password,username,name,email}= req.body
@@ -32,7 +32,9 @@ export const RegisterUser = async (req, res) => {
             description:newUser.description,
             profilePicture:newUser.profilePicture,
             followers:newUser.followers,
-            following:newUser.following
+            following:newUser.following,
+            posts:newUser.posts,
+            notifications:newUser.notifications
         })
         }else{
             res.status(401).json({error:"Failed to register user!"})
@@ -68,7 +70,8 @@ export const LoginUser = async (req,res)=>{
         profilePicture:user.profilePicture,
         followers:user.followers,
         following:user.following,
-        posts:user.posts
+        posts:user.posts,
+        notifications:user.notifications
     })
     }
     catch(err){

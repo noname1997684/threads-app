@@ -39,7 +39,12 @@ const userSchema = new mongoose.Schema({
     posts:[{
         type:mongoose.Schema.Types.ObjectId,
         ref:'Post'
-    }]
+    }],
+    notifications:{
+        type:Boolean,
+        default:false
+    }
+        
 },{
     timestamps:true
 })

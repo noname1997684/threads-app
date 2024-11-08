@@ -84,11 +84,7 @@ const LoginCard = () => {
             <Stack spacing={10} pt={2}>
                 <Button
                 size="lg"
-                bg={useColorModeValue("gray.600","gray.700")}
-                color={'white'}
-                _hover={{
-                    bg:useColorModeValue("gray.700","gray.800")
-                }}
+              
                 onClick={handleLogin}
                 >
                    Login 

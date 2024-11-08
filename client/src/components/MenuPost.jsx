@@ -33,7 +33,7 @@ const MenuPost = ({post,creator,updateOpen}) => {
                                 }}
                                 variant={"ghost"}
                                 borderRadius={"full"}
-                                zIndex={1}
+                                
                                 />
                                 
                                 <MenuList bg={useColorModeValue("white","gray.dark")} px={2}>

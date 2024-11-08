@@ -46,7 +46,7 @@ const Post = ({post,isReply}) => {
                         
                        <MenuPost post={post} creator={creator} updateOpen={onOpen}/>
                     </Flex>
-                    {post.content && <Text fontSize={"md"}>{post.content}</Text>}
+                    {post.content && <Text fontSize={"md"} maxW={"500"}>{post.content}</Text>}
                    
                     
                     

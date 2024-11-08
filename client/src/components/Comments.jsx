@@ -7,13 +7,13 @@ const Comments = ({reply,lastReply}) => {
     <Flex gap={4} py={2} my={2} w={"full"}>
         <Avatar src={reply.profilePicture} size={"sm"} name={reply.username}/>
         <Flex gap={1} w={"full"} flexDirection={"column"}>
-            <Flex w={"full"} justifyContent={"space-between"} alignItems={"center"}>
+            <Flex w={"full"} maxW={"200px"} justifyContent={"space-between"} alignItems={"center"}>
                 <Text fontSize={"sm"} fontWeight={"bold"}>
                     {reply.username}
                 </Text>
                 
             </Flex>
-            <Text>{reply.text}</Text>
+            <Text >{reply.text}</Text>
         </Flex>
 
     </Flex>

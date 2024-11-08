@@ -5,7 +5,7 @@ import useShowToast from '../hooks/useShowToast'
 import { useRecoilState, useRecoilValue } from 'recoil'
 import  postsAtom  from '../atoms/postsAtom'
 import Post from '../components/Post'
-import userAtom from '../atoms/userAtom'
+
 import { useLocation } from 'react-router-dom'
 
 

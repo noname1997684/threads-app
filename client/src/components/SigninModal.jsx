@@ -1,6 +1,7 @@
 import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Text, useColorModeValue, useDisclosure } from '@chakra-ui/react'
 import React from 'react'
 import { IoIosArrowForward } from 'react-icons/io'
+import { Link } from 'react-router-dom'
 
 const SigninModal = ({isOpenModal,modalTitle,onCloseModal}) => {
     
@@ -17,7 +18,7 @@ const SigninModal = ({isOpenModal,modalTitle,onCloseModal}) => {
       Join Threads to share ideas, ask questions, post random thoughts and more.
       </ModalBody>
       <ModalFooter alignSelf={"center"}>
-        <Button rightIcon={<IoIosArrowForward/>} w={"80"} py={6} bg={useColorModeValue("white","gray.dark")} border={"1px solid"} borderColor={"gray.light"}>
+        <Button as={Link} to={"/auth"} rightIcon={<IoIosArrowForward/>} w={"80"} py={6} bg={useColorModeValue("white","gray.dark")} border={"1px solid"} borderColor={"gray.light"}>
           Log In
         </Button>
       </ModalFooter>

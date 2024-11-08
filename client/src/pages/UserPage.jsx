@@ -1,5 +1,5 @@
-import { Box, Flex, Spinner, Text } from '@chakra-ui/react'
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import {  Flex, Spinner, Text } from '@chakra-ui/react'
+import  { useCallback, useEffect, useRef, useState } from 'react'
 import UserHeader from '../components/UserHeader'
 import useGetUserProfile from '../hooks/useGetUserProfile'
 import useShowToast from '../hooks/useShowToast'
@@ -102,7 +102,7 @@ const UserPage = () => {
         
         <UserHeader user={user}/>
        
-        {!loadingUserPosts && posts.length===0 && <Text>User has no posts</Text>}
+        {!loadingUserPosts && posts.length===0 && <Text>{pathname.includes("replies")?"User has no replies":"User has no posts"}</Text>}
         {
         posts.map((post,index)=>(
             <Flex flexDirection={'column'} ref={posts.length=== index+1?lastPostsCallback:null} key={post.id}>
