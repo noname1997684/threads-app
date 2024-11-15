@@ -1,12 +1,13 @@
 import { Avatar, Button, CloseButton, Flex, FormControl, Image, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Text, Textarea, useColorMode, useColorModeValue, useDisclosure } from '@chakra-ui/react'
 import React, { useRef, useState } from 'react'
-import { AddIcon } from '@chakra-ui/icons'
+
 import { BsFillImageFill } from 'react-icons/bs'
 import useGetPicture from '../hooks/useGetPicture'
 import useShowToast from '../hooks/useShowToast'
 import { useRecoilValue, useSetRecoilState } from 'recoil'
 import postsAtom from '../atoms/postsAtom'
 import userAtom from '../atoms/userAtom'
+import { useNavigate } from 'react-router-dom'
 const CreatePost = ({isOpen,onClose}) => {
   const MAX_CONTENT_LENGTH=200
   const {handlePicChange,picURL,setPicURL}= useGetPicture()
@@ -17,6 +18,7 @@ const CreatePost = ({isOpen,onClose}) => {
   const showToast= useShowToast()
   const setPosts= useSetRecoilState(postsAtom)
   const user= useRecoilValue(userAtom)
+  const navigate= useNavigate()
   const handleInputContentChange=(e)=>{
 
     if(e.target.value.length>MAX_CONTENT_LENGTH){
@@ -46,7 +48,7 @@ const CreatePost = ({isOpen,onClose}) => {
       }
       showToast('Success','Post created successfully','success')
       setPosts((prevPosts)=>[data,...prevPosts])
-
+      navigate(`/${user.username}/post/${data._id}`)
     } catch (error) {
       showToast('Error',error,'error')
     }finally{

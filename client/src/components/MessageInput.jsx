@@ -7,15 +7,15 @@ import useGetPicture from '../hooks/useGetPicture'
 import { useRecoilState } from 'recoil'
 import { conversationsAtom, selectedConversationAtom } from '../atoms/messagesAtom'
 const MessageInput = ({setMessages}) => {
-    const [messageText,setMessageText]= useState("")
-    const showToast= useShowToast()
-    const imageRef= useRef(null)
-    const {onClose}= useDisclosure()
-    
-    const [loading,setLoading]= useState(false)
-    const {handlePicChange,picURL,setPicURL}= useGetPicture()
-    const [selectedConversation,setSelectedConversation]= useRecoilState(selectedConversationAtom)
-    const [conversations,setConversations]=useRecoilState(conversationsAtom)
+const [messageText,setMessageText]= useState("")
+const showToast= useShowToast()
+const imageRef= useRef(null)
+const {onClose}= useDisclosure()
+
+const [loading,setLoading]= useState(false)
+const {handlePicChange,picURL,setPicURL}= useGetPicture()
+const [selectedConversation,setSelectedConversation]= useRecoilState(selectedConversationAtom)
+const [conversations,setConversations]=useRecoilState(conversationsAtom)
  const handleSendMessage = async(e)=>{
     e.preventDefault()
     if(!messageText && !picURL) return
